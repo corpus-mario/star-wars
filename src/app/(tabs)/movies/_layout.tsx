@@ -17,6 +17,7 @@ export default function MoviesLayout() {
         contentStyle: {
           backgroundColor: colors.grey,
         },
+        headerBackButtonDisplayMode: "minimal",
       }}
     >
       <Stack.Screen name="index" options={{ title: "All Movies" }} />

@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useLocalSearchParams, Stack, useFocusEffect } from "expo-router";
 import { format } from "date-fns";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import path from "path";
 
 import Loading from "@/components/Loading";
 import Empty from "@/components/Empty";
@@ -13,25 +16,66 @@ import colors from "@/constants/colors";
 export default function MovieDetailsScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [movie, setMovie] = useState<Movie>();
+  const [isFavorite, setIsFavorite] = useState(false);
   const { id } = useLocalSearchParams();
 
-  useEffect(() => {
-    const getMovie = async () => {
-      try {
-        setIsLoading(true);
+  useFocusEffect(
+    useCallback(() => {
+      getMovie();
+    }, [])
+  );
 
-        const response = await fetch(`https://www.swapi.tech/api/films/${id}`);
-        const data = await response.json();
-        setMovie(data.result.properties);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+  const getMovie = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(`https://www.swapi.tech/api/films/${id}`);
+      const data = await response.json();
+      setMovie(data.result.properties);
+
+      const favorites = await AsyncStorage.getItem("favorites");
+      if (favorites) {
+        setIsFavorite(
+          JSON.parse(favorites).some((movie: Movie) => {
+            const movieId = path.basename(movie.url.replace(/\/$/, ""));
+
+            return movieId === id;
+          })
+        );
       }
-    };
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    getMovie();
-  }, []);
+  const toggleFavorite = async () => {
+    try {
+      const favorites = await AsyncStorage.getItem("favorites");
+
+      if (favorites) {
+        const parsedFavorites = JSON.parse(favorites);
+        const updatedFavorites = isFavorite
+          ? parsedFavorites.filter((movie: Movie) => {
+              const movieId = path.basename(movie.url.replace(/\/$/, ""));
+              return movieId !== id;
+            })
+          : [movie, ...parsedFavorites];
+
+        await AsyncStorage.setItem(
+          "favorites",
+          JSON.stringify(updatedFavorites)
+        );
+      } else {
+        await AsyncStorage.setItem("favorites", JSON.stringify([movie]));
+      }
+
+      setIsFavorite((v) => !v);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -43,6 +87,19 @@ export default function MovieDetailsScreen() {
 
   return (
     <ScrollView>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Ionicons
+              name={isFavorite ? "star" : "star-outline"}
+              size={24}
+              color={colors.white}
+              onPress={toggleFavorite}
+            />
+          ),
+        }}
+      />
+
       <View style={styles.container}>
         <Text style={styles.title}>{movie.title}</Text>
 
@@ -68,7 +125,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.yellow,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "600",
   },
   detailsContainer: {
