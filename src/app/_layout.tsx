@@ -1,5 +1,12 @@
+import React from "react";
+import { StatusBar } from "expo-status-bar";
 import { Slot } from "expo-router";
 
 export default function RootLayout() {
-  return <Slot />;
+  return (
+    <>
+      <Slot />
+      <StatusBar style="light" />
+    </>
+  );
 }

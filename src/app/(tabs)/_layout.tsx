@@ -15,8 +15,13 @@ export default function TabsLayout() {
           fontWeight: "bold",
         },
         headerShadowVisible: false,
+        sceneStyle: {
+          backgroundColor: colors.grey,
+        },
         tabBarStyle: {
           backgroundColor: colors.black,
+          borderTopWidth: 1,
+          borderTopColor: colors.yellow,
         },
         tabBarActiveTintColor: colors.yellow,
       }}
