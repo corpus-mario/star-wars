@@ -26,10 +26,11 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.yellow,
       }}
     >
+      <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen
-        name="index"
+        name="movies"
         options={{
-          title: "All Movies",
+          headerShown: false,
           tabBarLabel: "Movies",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="film-outline" color={color} size={size} />

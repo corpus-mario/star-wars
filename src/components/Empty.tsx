@@ -6,7 +6,7 @@ type EmptyProps = {
   text?: string;
 };
 
-export default function Empty({ text = "No item found" }: EmptyProps) {
+export default function Empty({ text = "No movie found" }: EmptyProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{text}</Text>
