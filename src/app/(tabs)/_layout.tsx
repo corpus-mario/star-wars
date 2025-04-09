@@ -29,18 +29,18 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "All Films",
-          tabBarLabel: "Films",
+          title: "All Movies",
+          tabBarLabel: "Movies",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="film-outline" color={color} size={size} />
           ),
         }}
       />
       <Tabs.Screen
-        name="people"
+        name="characters"
         options={{
           title: "All Characters",
-          tabBarLabel: "People",
+          tabBarLabel: "Characters",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people-outline" color={color} size={size} />
           ),

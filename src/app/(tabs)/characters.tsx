@@ -1,9 +1,9 @@
 import { StyleSheet, View, Text } from "react-native";
 
-export default function PeopleScreen() {
+export default function CharactersScreen() {
   return (
     <View>
-      <Text>People Screen</Text>
+      <Text>Characters Screen</Text>
     </View>
   );
 }

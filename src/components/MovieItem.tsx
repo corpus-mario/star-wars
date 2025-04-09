@@ -1,21 +1,21 @@
 import { StyleSheet, View, Text } from "react-native";
 import { format } from "date-fns";
 
-import { Film } from "@/types";
+import { Movie } from "@/types";
 
 import colors from "@/constants/colors";
 
-type FilmItemProps = {
-  film: Film;
+type MovieItemProps = {
+  movie: Movie;
 };
 
-export default function FilmItem({ film }: FilmItemProps) {
+export default function MovieItem({ movie }: MovieItemProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{film.title}</Text>
-      <Text style={styles.details}>Episode: {film.episode_id}</Text>
+      <Text style={styles.title}>{movie.title}</Text>
+      <Text style={styles.details}>Episode: {movie.episode_id}</Text>
       <Text style={styles.details}>
-        Released: {format(film.release_date, "MMMM d, yyyy")}
+        Released: {format(movie.release_date, "MMMM d, yyyy")}
       </Text>
     </View>
   );
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.yellow,
     fontSize: 20,
+    fontWeight: "600",
     marginBottom: 8,
   },
   details: {
