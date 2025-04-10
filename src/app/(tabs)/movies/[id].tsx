@@ -3,11 +3,11 @@ import { StyleSheet, ScrollView, View, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, Stack, useFocusEffect } from "expo-router";
 import { format } from "date-fns";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import path from "path";
 
 import Loading from "@/components/Loading";
 import Empty from "@/components/Empty";
+
+import useFavorites from "@/hooks/useFavorites";
 
 import { Movie } from "@/types";
 
@@ -16,33 +16,25 @@ import colors from "@/constants/colors";
 export default function MovieDetailsScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [movie, setMovie] = useState<Movie>();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [favorite, setFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
   const { id } = useLocalSearchParams();
 
   useFocusEffect(
     useCallback(() => {
-      getMovie();
+      fetchMovie();
     }, [])
   );
 
-  const getMovie = async () => {
+  const fetchMovie = async () => {
     try {
       setIsLoading(true);
 
       const response = await fetch(`https://www.swapi.tech/api/films/${id}`);
       const data = await response.json();
+
       setMovie(data.result.properties);
-
-      const favorites = await AsyncStorage.getItem("favorites");
-      if (favorites) {
-        setIsFavorite(
-          JSON.parse(favorites).some((movie: Movie) => {
-            const movieId = path.basename(movie.url.replace(/\/$/, ""));
-
-            return movieId === id;
-          })
-        );
-      }
+      setFavorite(await isFavorite(data.result.properties));
     } catch (error) {
       console.error(error);
     } finally {
@@ -50,28 +42,12 @@ export default function MovieDetailsScreen() {
     }
   };
 
-  const toggleFavorite = async () => {
+  const handleToggle = async () => {
     try {
-      const favorites = await AsyncStorage.getItem("favorites");
-
-      if (favorites) {
-        const parsedFavorites = JSON.parse(favorites);
-        const updatedFavorites = isFavorite
-          ? parsedFavorites.filter((movie: Movie) => {
-              const movieId = path.basename(movie.url.replace(/\/$/, ""));
-              return movieId !== id;
-            })
-          : [movie, ...parsedFavorites];
-
-        await AsyncStorage.setItem(
-          "favorites",
-          JSON.stringify(updatedFavorites)
-        );
-      } else {
-        await AsyncStorage.setItem("favorites", JSON.stringify([movie]));
+      if (movie) {
+        await toggleFavorite(movie);
+        setFavorite((v) => !v);
       }
-
-      setIsFavorite((v) => !v);
     } catch (error) {
       console.error(error);
     }
@@ -91,10 +67,10 @@ export default function MovieDetailsScreen() {
         options={{
           headerRight: () => (
             <Ionicons
-              name={isFavorite ? "star" : "star-outline"}
+              name={favorite ? "star" : "star-outline"}
               size={24}
               color={colors.white}
-              onPress={toggleFavorite}
+              onPress={handleToggle}
             />
           ),
         }}

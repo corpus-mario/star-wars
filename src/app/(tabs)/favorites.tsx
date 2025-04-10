@@ -1,8 +1,6 @@
 import { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
 import { useFocusEffect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import path from "path";
 
 import Loading from "@/components/Loading";
 import Empty from "@/components/Empty";
@@ -10,27 +8,26 @@ import FavoriteItem from "@/components/FavoriteItem";
 
 import { Movie } from "@/types";
 
+import useFavorites from "@/hooks/useFavorites";
+
 import colors from "@/constants/colors";
 
 export default function FavoritesScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [favorites, setFavorites] = useState<Movie[]>([]);
+  const { getFavorites, deleteFavorite } = useFavorites();
 
   useFocusEffect(
     useCallback(() => {
-      getFavorites();
+      fetchFavorites();
     }, [])
   );
 
-  const getFavorites = async () => {
+  const fetchFavorites = async () => {
     try {
       setIsLoading(true);
-
-      const favorites = await AsyncStorage.getItem("favorites");
-      if (favorites) {
-        setFavorites(JSON.parse(favorites));
-      }
+      setFavorites(await getFavorites());
     } catch (error) {
       console.error(error);
     } finally {
@@ -41,23 +38,12 @@ export default function FavoritesScreen() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    getFavorites();
+    fetchFavorites();
   };
 
   const handleDelete = async (movie: Movie) => {
-    const favorites = await AsyncStorage.getItem("favorites");
-
-    if (favorites) {
-      const movieId = path.basename(movie.url.replace(/\/$/, ""));
-
-      const updatedFavorites = JSON.parse(favorites).filter((_movie: Movie) => {
-        const _id = path.basename(_movie.url.replace(/\/$/, ""));
-        return _id !== movieId;
-      });
-
-      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      setFavorites(updatedFavorites);
-    }
+    await deleteFavorite(movie);
+    await fetchFavorites();
   };
 
   if (isLoading) {

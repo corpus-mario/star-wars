@@ -15,10 +15,10 @@ export default function MoviesScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    getMovies();
+    fetchMovies();
   }, []);
 
-  const getMovies = async () => {
+  const fetchMovies = async () => {
     try {
       setIsLoading(true);
 
@@ -35,7 +35,7 @@ export default function MoviesScreen() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    getMovies();
+    fetchMovies();
   };
 
   if (isLoading) {
