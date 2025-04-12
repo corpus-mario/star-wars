@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
+import { View, FlatList, RefreshControl } from "react-native";
 
 import Loading from "@/components/Loading";
 import MovieItem from "@/components/MovieItem";
@@ -15,10 +15,10 @@ export default function MoviesScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchMovies();
+    getMovies();
   }, []);
 
-  const fetchMovies = async () => {
+  const getMovies = async () => {
     try {
       setIsLoading(true);
 
@@ -35,7 +35,7 @@ export default function MoviesScreen() {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    fetchMovies();
+    getMovies();
   };
 
   if (isLoading) {
@@ -43,7 +43,7 @@ export default function MoviesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={movies}
         renderItem={({ item }) => <MovieItem movie={item} />}
@@ -59,9 +59,3 @@ export default function MoviesScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

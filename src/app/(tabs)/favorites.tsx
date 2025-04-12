@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
+import { View, FlatList, RefreshControl } from "react-native";
 import { useFocusEffect } from "expo-router";
 
 import Loading from "@/components/Loading";
@@ -8,7 +8,7 @@ import FavoriteItem from "@/components/FavoriteItem";
 
 import { Movie } from "@/types";
 
-import useFavorites from "@/hooks/useFavorites";
+import { getFavorites, deleteFavorite } from "@/utils/favorites";
 
 import colors from "@/constants/colors";
 
@@ -16,7 +16,6 @@ export default function FavoritesScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [favorites, setFavorites] = useState<Movie[]>([]);
-  const { getFavorites, deleteFavorite } = useFavorites();
 
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +50,7 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={favorites}
         renderItem={({ item }) => (
@@ -69,9 +68,3 @@ export default function FavoritesScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

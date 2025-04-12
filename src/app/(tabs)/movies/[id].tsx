@@ -7,9 +7,9 @@ import { format } from "date-fns";
 import Loading from "@/components/Loading";
 import Empty from "@/components/Empty";
 
-import useFavorites from "@/hooks/useFavorites";
-
 import { Movie } from "@/types";
+
+import { isFavorite, toggleFavorite } from "@/utils/favorites";
 
 import colors from "@/constants/colors";
 
@@ -17,24 +17,24 @@ export default function MovieDetailsScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [movie, setMovie] = useState<Movie>();
   const [favorite, setFavorite] = useState(false);
-  const { isFavorite, toggleFavorite } = useFavorites();
   const { id } = useLocalSearchParams();
 
   useFocusEffect(
     useCallback(() => {
-      fetchMovie();
+      getMovie();
     }, [])
   );
 
-  const fetchMovie = async () => {
+  const getMovie = async () => {
     try {
       setIsLoading(true);
 
       const response = await fetch(`https://www.swapi.tech/api/films/${id}`);
       const data = await response.json();
+      const movieData = data.result.properties;
 
-      setMovie(data.result.properties);
-      setFavorite(await isFavorite(data.result.properties));
+      setMovie(movieData);
+      setFavorite(await isFavorite(movieData));
     } catch (error) {
       console.error(error);
     } finally {
@@ -79,7 +79,7 @@ export default function MovieDetailsScreen() {
       <View style={styles.container}>
         <Text style={styles.title}>{movie.title}</Text>
 
-        <View style={styles.detailsContainer}>
+        <View style={{ gap: 12 }}>
           <Text style={styles.details}>Episode: {movie.episode_id}</Text>
           <Text style={styles.details}>Director: {movie.director}</Text>
           <Text style={styles.details}>Producer: {movie.producer}</Text>
@@ -104,17 +104,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
   },
-  detailsContainer: {
-    gap: 12,
-  },
   details: {
     color: colors.white,
-    fontSize: 16,
   },
   openingCrawl: {
     color: colors.white,
     fontStyle: "italic",
     letterSpacing: 2,
-    fontSize: 16,
+    lineHeight: 20,
   },
 });
